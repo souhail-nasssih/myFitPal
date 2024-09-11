@@ -1,0 +1,113 @@
+{
+  "project_info": {
+    "project_number": "838934902809",
+    "project_id": "fitnessmobile-1bca4",
+    "storage_bucket": "fitnessmobile-1bca4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:838934902809:android:f3ea2e2f6522e026f91288",
+        "android_client_info": {
+          "package_name": "com.example.app_fitness"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "838934902809-q5u8qrq5bfbrqg99rbio5etuj009vkd1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.app_fitness",
+            "certificate_hash": "ae5bd57d8bd97b65a1714fc20c90f24604940e8e"
+          }
+        },
+        {
+          "client_id": "838934902809-2njepaqjjaqej56bha109s562np8682c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDF3UdegnONxukMvWX4E6TEWRucCcXrZZA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "838934902809-2njepaqjjaqej56bha109s562np8682c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:838934902809:android:62a9bdc5408d1c90f91288",
+        "android_client_info": {
+          "package_name": "com.example.fitness_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "838934902809-2njepaqjjaqej56bha109s562np8682c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDF3UdegnONxukMvWX4E6TEWRucCcXrZZA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "838934902809-2njepaqjjaqej56bha109s562np8682c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:838934902809:android:052af6fe08655320f91288",
+        "android_client_info": {
+          "package_name": "com.example.myfitpal"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "838934902809-7vqgjcnhetam56n8krlcphqr8ebvrke9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.myfitpal",
+            "certificate_hash": "ae5bd57d8bd97b65a1714fc20c90f24604940e8e"
+          }
+        },
+        {
+          "client_id": "838934902809-2njepaqjjaqej56bha109s562np8682c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDF3UdegnONxukMvWX4E6TEWRucCcXrZZA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "838934902809-2njepaqjjaqej56bha109s562np8682c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
