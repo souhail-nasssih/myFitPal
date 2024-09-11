@@ -14,5 +14,7 @@ class ColorsHelper {
   static const Color colortransparent = Colors.transparent;
   static const Color colorBlue = Colors.blue;
   static const Color colorTextWhite = Colors.white;
+  static const Color colorProfil =
+      Color.fromARGB(128, 46, 5, 53); // Couleur avec opacité intégrée
   static Color? colorGreyT = Colors.grey[600];
 }

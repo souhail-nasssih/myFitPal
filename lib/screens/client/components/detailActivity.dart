@@ -22,11 +22,11 @@ class ActivityDetailScreen extends StatelessWidget {
             ],
           ),
         ),
-        body: TabBarView(
+        body: const TabBarView(
           children: [
             Center(child: ProfileList()),
-            const Center(child: Text('Localisation Info')),
-            const Center(child: Text('Session Info')),
+            Center(child: Text('Localisation Info')),
+            Center(child: Text('Session Info')),
           ],
         ),
         bottomNavigationBar: const BottomBar(

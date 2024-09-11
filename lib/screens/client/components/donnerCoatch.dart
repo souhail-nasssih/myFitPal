@@ -37,11 +37,11 @@ class _ProfileListState extends State<ProfileList> {
       future: _fetchProfiles(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
           return Center(child: Text('Erreur: ${snapshot.error}'));
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return Center(child: Text('Aucun coach disponible.'));
+          return const Center(child: Text('Aucun coach disponible.'));
         } else {
           final profiles = snapshot.data!;
           return ListView.builder(
