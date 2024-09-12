@@ -3,7 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:myfitpal/helpers/helpers.dart'; // Assurez-vous que ce chemin est correct
 import 'package:myfitpal/layouts/bottom_bar.dart';
-import 'package:myfitpal/screens/client/components/allActivity.dart';
+import 'package:myfitpal/screens/client/pages/IntensiveActivities.dart';
+import 'package:myfitpal/screens/client/pages/PopularActivities.dart';
+import 'package:myfitpal/screens/client/pages/allActivity.dart';
 import 'package:myfitpal/screens/client/components/detailActivity.dart';
 
 class ActivityScreen extends StatefulWidget {
@@ -17,7 +19,7 @@ class _ActivityScreenState extends State<ActivityScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   late PageController _pageController;
-  String? _userName; // Variable to store the user's name
+  String? _userName;
 
   @override
   void initState() {
@@ -36,27 +38,23 @@ class _ActivityScreenState extends State<ActivityScreen>
       }
     });
 
-    // Fetch the client's name after initialization
     getClientName();
   }
 
-  // Function to retrieve the client's name from Firestore
   Future<void> getClientName() async {
     String userId = FirebaseAuth.instance.currentUser?.uid ?? '';
 
     if (userId.isNotEmpty) {
       try {
         DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
-            .collection(
-                'clients') // Assurez-vous que la collection est correcte
-            .doc(userId) // Rechercher par ID
+            .collection('clients')
+            .doc(userId)
             .get();
 
         if (documentSnapshot.exists) {
           var clientData = documentSnapshot.data() as Map<String, dynamic>;
           setState(() {
-            _userName = clientData['fullname'] ??
-                'Utilisateur inconnu'; // Default if name is not found
+            _userName = clientData['fullname'] ?? 'Utilisateur inconnu';
           });
         } else {
           setState(() {
@@ -91,7 +89,7 @@ class _ActivityScreenState extends State<ActivityScreen>
           children: [
             const Text('Activités, '),
             Text(
-              _userName ?? 'Utilisateur inconnu', // Display the username
+              _userName ?? 'Utilisateur inconnu',
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ],
@@ -111,12 +109,13 @@ class _ActivityScreenState extends State<ActivityScreen>
       body: PageView(
         controller: _pageController,
         children: [
-          AllActivitiesPage(onActivityClick: (activity) {
-            print('Navigating to details for: $activity');
+          AllActivitiesPage(onActivityClick: (activityID) {
+            print('Navigating to details for: $activityID');
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ActivityDetailScreen(activity: activity),
+                builder: (context) =>
+                    ActivityDetailScreen(activityID: activityID),
               ),
             );
           }),
@@ -124,27 +123,7 @@ class _ActivityScreenState extends State<ActivityScreen>
           const IntensiveActivitiesPage(),
         ],
       ),
-      bottomNavigationBar: const BottomBar(
-        currentIndex: 0,
-      ),
+      bottomNavigationBar: const BottomBar(currentIndex: 0),
     );
-  }
-}
-
-class PopularActivitiesPage extends StatelessWidget {
-  const PopularActivitiesPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text('Popular Activities'));
-  }
-}
-
-class IntensiveActivitiesPage extends StatelessWidget {
-  const IntensiveActivitiesPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text('Intensive Activities'));
   }
 }

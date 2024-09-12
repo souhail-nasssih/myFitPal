@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:myfitpal/auth/login_screen.dart';
 import 'package:myfitpal/helpers/helpers.dart';
 import 'package:myfitpal/layouts/bottom_bar.dart';
-import 'package:myfitpal/screens/components/loading.dart';
+import 'package:myfitpal/screens/components/loading.dart'; // Assurez-vous que ce chemin est correct
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -53,31 +53,42 @@ class _ProfilePageState extends State<ProfilePage> {
       future: _clientDataFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: FitnessLoading());
+          // Afficher le widget de chargement pendant le chargement des données
+          return const Scaffold(
+            body: Center(
+                child:
+                    FitnessLoading()), // Remplacez avec le widget de chargement
+          );
         } else if (snapshot.hasError) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Erreur: ${snapshot.error}',
-                  style: const TextStyle(color: Colors.red, fontSize: 18),
-                ),
-                const SizedBox(height: 10),
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      _clientDataFuture =
-                          getClientData(); // Relancer la récupération des données
-                    });
-                  },
-                  child: const Text('Réessayer'),
-                ),
-              ],
+          // Afficher un message d'erreur et un bouton pour réessayer en cas d'erreur
+          return Scaffold(
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Erreur: ${snapshot.error}',
+                    style: const TextStyle(color: Colors.red, fontSize: 18),
+                  ),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        _clientDataFuture =
+                            getClientData(); // Relancer la récupération des données
+                      });
+                    },
+                    child: const Text('Réessayer'),
+                  ),
+                ],
+              ),
             ),
           );
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Center(child: Text('Données utilisateur introuvables'));
+          // Afficher un message lorsque les données utilisateur ne sont pas trouvées
+          return const Scaffold(
+            body: Center(child: Text('Données utilisateur introuvables')),
+          );
         } else {
           final userData = snapshot.data!;
           return Scaffold(

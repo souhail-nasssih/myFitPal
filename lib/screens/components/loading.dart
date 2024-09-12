@@ -16,7 +16,7 @@ class _FitnessLoadingState extends State<FitnessLoading>
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(seconds: 2),
+      duration: const Duration(seconds: 5),
       vsync: this,
     )..repeat(); // Répétition infinie de l'animation
   }
@@ -30,8 +30,8 @@ class _FitnessLoadingState extends State<FitnessLoading>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:
-          Colors.transparent, // Arrière-plan sombre pour un bon contraste
+      backgroundColor: Colors
+          .transparent, // Changer la couleur d'arrière-plan pour le contraste
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -66,7 +66,8 @@ class _FitnessLoadingState extends State<FitnessLoading>
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
-                color: Colors.white70,
+                color: Colors.grey,
+                // Assurez-vous que la couleur du texte contraste avec l'arrière-plan
               ),
             ),
           ],

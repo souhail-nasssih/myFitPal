@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:myfitpal/layouts/bottom_bar.dart';
-import 'package:myfitpal/screens/client/components/donnerCoatch.dart';
+import 'package:myfitpal/screens/client/components/giveCoatch.dart';
+import 'package:myfitpal/screens/client/components/searchLocation.dart';
 
 class ActivityDetailScreen extends StatelessWidget {
-  final String activity;
+  final String activityID;
 
-  const ActivityDetailScreen({super.key, required this.activity});
+  const ActivityDetailScreen({super.key, required this.activityID});
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +14,7 @@ class ActivityDetailScreen extends StatelessWidget {
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          title: Text('$activity Details'),
+          title: Text('$activityID Details'), // Afficher l'ID de l'activité
           bottom: const TabBar(
             tabs: [
               Tab(text: 'Coach'),
@@ -22,15 +23,15 @@ class ActivityDetailScreen extends StatelessWidget {
             ],
           ),
         ),
-        body: const TabBarView(
+        body: TabBarView(
           children: [
-            Center(child: ProfileList()),
-            Center(child: Text('Localisation Info')),
-            Center(child: Text('Session Info')),
+            GiveCoatch(
+                activityID: activityID), // Passer activityID à ProfileList
+            SearchLocation(activityID: activityID),
+            const Center(child: Text('Session Info')),
           ],
         ),
-        bottomNavigationBar: const BottomBar(
-            currentIndex: 0), // Afficher la BottomBar une seule fois
+        bottomNavigationBar: const BottomBar(currentIndex: 0),
       ),
     );
   }
