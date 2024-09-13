@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:myfitpal/auth/login_screen.dart';
@@ -5,15 +6,63 @@ import 'package:myfitpal/helpers/helpers.dart';
 import 'package:myfitpal/layouts/base_app_bar.dart';
 import 'package:myfitpal/layouts/bottom_bar.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
+
+  @override
+  _ProfilePageState createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  String? _userName;
+  String? _bio;
+  String? _location;
+  String? _pricing;
+  String? _profileImageUrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _getUserData();
+  }
+
+  // Fetch user information from Firestore based on logged-in user ID
+  Future<void> _getUserData() async {
+    String userId = FirebaseAuth.instance.currentUser?.uid ?? '';
+
+    if (userId.isNotEmpty) {
+      try {
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('clients') // Assuming you're storing clients
+            .doc(userId)
+            .get();
+
+        if (userDoc.exists) {
+          var userData = userDoc.data() as Map<String, dynamic>;
+          setState(() {
+            _userName = userData['fullname'] ?? 'Unknown User';
+            _bio = userData['bio'] ?? 'No bio available';
+            _location = userData['location'] ?? 'Unknown location';
+            _pricing = userData['pricing'] != null
+                ? '\$${userData['pricing']}/H'
+                : 'Pricing not available';
+            _profileImageUrl = userData['profileImageUrl'] ??
+                'images/avatar.png'; // Default image if no profile pic exists
+          });
+        } else {
+          print('User document does not exist');
+        }
+      } catch (e) {
+        print('Error fetching user data: $e');
+      }
+    }
+  }
 
   Future<void> _logout(BuildContext context) async {
     await FirebaseAuth.instance.signOut();
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(
-          builder: (context) => const LoginScreen()), // Redirect to LoginPage
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
     );
   }
 
@@ -23,7 +72,7 @@ class ProfilePage extends StatelessWidget {
       appBar: BaseAppBar(
         title: 'Profile',
         onBackPressed: () {
-          Navigator.pop(context); // Navigate back to the previous screen
+          Navigator.pop(context);
         },
       ),
       body: Padding(
@@ -33,24 +82,26 @@ class ProfilePage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             const Padding(padding: EdgeInsets.all(10)),
-            const CircleAvatar(
+            CircleAvatar(
               radius: 50,
-              backgroundImage: AssetImage(
-                  'images/avatar.png'), // Replace with your image asset
+              backgroundImage: _profileImageUrl != null
+                  ? NetworkImage(_profileImageUrl!)
+                  : const AssetImage('images/avatar.png') as ImageProvider,
               backgroundColor: Colors.transparent,
             ),
             const Padding(padding: EdgeInsets.all(10)),
             const SizedBox(height: 16),
-            const Text(
-              'Alex Taylor',
-              style: TextStyle(
+            Text(
+              _userName ?? 'Unknown User',
+              style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              'Hi, I\'m Alex Taylor,\nA certified fitness coach passionate about helping people get stronger and healthier. \nI create personalized workout to make fitness fun and effective for everyone',
+              _bio ??
+                  'No bio available', // Display bio or fallback text if bio is null
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16,
@@ -64,7 +115,7 @@ class ProfilePage extends StatelessWidget {
                 Icon(Icons.location_on, color: ColorsHelper.colorGreyT),
                 const SizedBox(width: 8),
                 Text(
-                  'New York City',
+                  _location ?? 'Unknown location',
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.grey[700],
@@ -79,7 +130,7 @@ class ProfilePage extends StatelessWidget {
                 Icon(Icons.attach_money, color: ColorsHelper.colorGreyT),
                 const SizedBox(width: 8),
                 Text(
-                  'Pricing: \$70/H',
+                  _pricing ?? 'Pricing not available',
                   style: TextStyle(
                     fontSize: 16,
                     color: ColorsHelper.colorGreyT,
@@ -87,13 +138,12 @@ class ProfilePage extends StatelessWidget {
                 ),
               ],
             ),
-            const Spacer(), // This will push the Logout button to the bottom
+            const Spacer(),
             ElevatedButton(
               onPressed: () => _logout(context),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),

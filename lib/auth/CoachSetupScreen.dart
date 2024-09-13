@@ -21,8 +21,27 @@ class _CoachSetupScreenState extends State<CoachSetupScreen> {
   final TextEditingController _ageController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
   DateTime _selectedBirthday = DateTime.now();
-  String? _selectedActivityId;
+  List<String> _selectedActivities = []; // List to hold multiple activity IDs
+  List<QueryDocumentSnapshot> _activities = []; // Store the activities data
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchActivities(); // Fetch the activities when the screen initializes
+  }
+
+  Future<void> _fetchActivities() async {
+    try {
+      final snapshot = await FirebaseFirestore.instance.collection('activity').get();
+      setState(() {
+        _activities = snapshot.docs; // Store activities data in the state
+      });
+    } catch (e) {
+      // Handle error (e.g., show a message if there’s an error fetching activities)
+      print('Error fetching activities: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -166,25 +185,29 @@ class _CoachSetupScreenState extends State<CoachSetupScreen> {
                   child: const Text('Select Date'),
                 ),
                 const SizedBox(height: 20),
-                DropdownButtonFormField<String>(
-                  decoration: const InputDecoration(
-                    labelText: 'Activity',
-                    border: OutlineInputBorder(),
-                  ),
-                  value: _selectedActivityId,
-                  onChanged: (newValue) {
-                    setState(() {
-                      _selectedActivityId = newValue;
-                    });
-                  },
-                  items: ['vZtdHL54Ma8Bz9BlXNxP', 'AnotherActivityID']
-                      .map((activityId) => DropdownMenuItem(
-                    value: activityId,
-                    child: Text(activityId),
-                  ))
-                      .toList(),
-                  validator: (value) =>
-                  value == null ? 'Please select an activity ID' : null,
+                // Multi-select for Activities
+                const Text('Select Activities'),
+                _activities.isEmpty
+                    ? const CircularProgressIndicator() // Show loading indicator until activities are fetched
+                    : Column(
+                  children: _activities.map((activity) {
+                    final activityId = activity.id;
+                    final activityName = activity['activityName'] ?? 'Activity';
+
+                    return CheckboxListTile(
+                      title: Text(activityName),
+                      value: _selectedActivities.contains(activityId),
+                      onChanged: (isChecked) {
+                        setState(() {
+                          if (isChecked!) {
+                            _selectedActivities.add(activityId);
+                          } else {
+                            _selectedActivities.remove(activityId);
+                          }
+                        });
+                      },
+                    );
+                  }).toList(),
                 ),
                 const SizedBox(height: 40),
                 ElevatedButton(
@@ -226,7 +249,7 @@ class _CoachSetupScreenState extends State<CoachSetupScreen> {
 
       final coachData = {
         'fullName': _fullNameController.text,
-        'activityID': FirebaseFirestore.instance.collection('activities').doc(_selectedActivityId),
+        'activityIDs': _selectedActivities, // Store selected activities as a list
         'age': int.tryParse(_ageController.text) ?? 0,
         'birthday': Timestamp.fromDate(_selectedBirthday),
         'certifications': _certificationsController.text,
@@ -270,5 +293,4 @@ class _CoachSetupScreenState extends State<CoachSetupScreen> {
       });
     }
   }
-
 }
