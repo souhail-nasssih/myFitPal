@@ -18,7 +18,7 @@ class _CoachSetupScreenState extends State<CoachSetupScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _certificationsController = TextEditingController();
   final TextEditingController _pricingController = TextEditingController();
-  final TextEditingController _ageController = TextEditingController();
+
   final TextEditingController _cityController = TextEditingController();
   DateTime _selectedBirthday = DateTime.now();
   List<String> _selectedActivities = []; // List to hold multiple activity IDs
@@ -39,7 +39,9 @@ class _CoachSetupScreenState extends State<CoachSetupScreen> {
       });
     } catch (e) {
       // Handle error (e.g., show a message if there’s an error fetching activities)
-      print('Error fetching activities: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error fetching activities: $e')),
+      );
     }
   }
 
@@ -133,24 +135,7 @@ class _CoachSetupScreenState extends State<CoachSetupScreen> {
                   },
                 ),
                 const SizedBox(height: 20),
-                TextFormField(
-                  controller: _ageController,
-                  decoration: const InputDecoration(
-                    labelText: 'Age',
-                    border: OutlineInputBorder(),
-                  ),
-                  keyboardType: TextInputType.number,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your age';
-                    }
-                    final age = int.tryParse(value);
-                    if (age == null || age <= 0) {
-                      return 'Please enter a valid age';
-                    }
-                    return null;
-                  },
-                ),
+
                 const SizedBox(height: 20),
                 TextFormField(
                   controller: _cityController,
@@ -250,7 +235,7 @@ class _CoachSetupScreenState extends State<CoachSetupScreen> {
       final coachData = {
         'fullName': _fullNameController.text,
         'activityIDs': _selectedActivities, // Store selected activities as a list
-        'age': int.tryParse(_ageController.text) ?? 0,
+
         'birthday': Timestamp.fromDate(_selectedBirthday),
         'certifications': _certificationsController.text,
         'city': _cityController.text,
