@@ -16,6 +16,8 @@ class _ClientSetupScreenState extends State<ClientSetupScreen> {
   final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _ageController = TextEditingController();
   final TextEditingController _goalController = TextEditingController();
+  final TextEditingController _phoneNumberController = TextEditingController();
+  final TextEditingController _locationController = TextEditingController();
   String? _selectedGender;
   DateTime _selectedBirthday = DateTime.now();
   bool _isLoading = false;
@@ -64,6 +66,18 @@ class _ClientSetupScreenState extends State<ClientSetupScreen> {
                 _buildTextField(
                   _fullNameController, 'Full Name',
                   'Please enter your full name',
+                  const Color(0xFFDF6D00),
+                ),
+                const SizedBox(height: 20),
+                _buildTextField(
+                  _phoneNumberController, 'Phone Number',
+                  'Please enter your Phone Number',
+                  const Color(0xFFDF6D00),
+                ),
+                const SizedBox(height: 20),
+                _buildTextField(
+                  _locationController, 'Location',
+                  'Please enter your Location',
                   const Color(0xFFDF6D00),
                 ),
                 const SizedBox(height: 20),
@@ -181,20 +195,6 @@ class _ClientSetupScreenState extends State<ClientSetupScreen> {
     );
   }
 
-  Future<void> _selectBirthday() async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: _selectedBirthday,
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
-    );
-    if (picked != null && picked != _selectedBirthday) {
-      setState(() {
-        _selectedBirthday = picked;
-      });
-    }
-  }
-
   Future<void> _submitData() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -210,44 +210,41 @@ class _ClientSetupScreenState extends State<ClientSetupScreen> {
 
       final clientData = {
         'age': int.tryParse(_ageController.text) ?? 0,
-        'birthday': Timestamp.fromDate(_selectedBirthday),
-        'email': user.email ?? '',
-        'fullname': _fullNameController.text,
-        'gender': _selectedGender ?? '',
+        'birthday': _selectedBirthday,
+        'email': user.email,
+        'fullName': _fullNameController.text,
+        'gender': _selectedGender,
         'goal': _goalController.text,
       };
 
-      await FirebaseFirestore.instance
-          .collection('clients')
-          .doc(user.uid)
-          .set(clientData);
+      // Save to Firestore
+      await FirebaseFirestore.instance.collection('clients').doc(user.uid).set(clientData);
 
-      // Redirect to LandingPage
+      // Redirect to ActivityScreen
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const ActivityScreen()),
       );
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Error'),
-          content: Text('An error occurred: $e'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('OK'),
-            ),
-          ],
-        ),
-      );
+    } catch (error) {
+      print('Error: $error');
     } finally {
       setState(() {
         _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _selectBirthday() async {
+    final selectedDate = await showDatePicker(
+      context: context,
+      initialDate: _selectedBirthday,
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+
+    if (selectedDate != null) {
+      setState(() {
+        _selectedBirthday = selectedDate;
       });
     }
   }

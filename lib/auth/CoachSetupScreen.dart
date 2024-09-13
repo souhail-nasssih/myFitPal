@@ -16,13 +16,36 @@ class _CoachSetupScreenState extends State<CoachSetupScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _certificationsController = TextEditingController();
+  final TextEditingController _certificationsController =
+      TextEditingController();
   final TextEditingController _pricingController = TextEditingController();
-  final TextEditingController _ageController = TextEditingController();
+
   final TextEditingController _cityController = TextEditingController();
   DateTime _selectedBirthday = DateTime.now();
-  String? _selectedActivityId;
+  List<String> _selectedActivities = []; // List to hold multiple activity IDs
+  List<QueryDocumentSnapshot> _activities = []; // Store the activities data
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchActivities(); // Fetch the activities when the screen initializes
+  }
+
+  Future<void> _fetchActivities() async {
+    try {
+      final snapshot =
+          await FirebaseFirestore.instance.collection('activity').get();
+      setState(() {
+        _activities = snapshot.docs; // Store activities data in the state
+      });
+    } catch (e) {
+      // Handle error (e.g., show a message if there’s an error fetching activities)
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error fetching activities: $e')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +57,8 @@ class _CoachSetupScreenState extends State<CoachSetupScreen> {
           onPressed: () {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => const PathSelectionScreen()),
+              MaterialPageRoute(
+                  builder: (context) => const PathSelectionScreen()),
             );
           },
         ),
@@ -114,24 +138,7 @@ class _CoachSetupScreenState extends State<CoachSetupScreen> {
                   },
                 ),
                 const SizedBox(height: 20),
-                TextFormField(
-                  controller: _ageController,
-                  decoration: const InputDecoration(
-                    labelText: 'Age',
-                    border: OutlineInputBorder(),
-                  ),
-                  keyboardType: TextInputType.number,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your age';
-                    }
-                    final age = int.tryParse(value);
-                    if (age == null || age <= 0) {
-                      return 'Please enter a valid age';
-                    }
-                    return null;
-                  },
-                ),
+
                 const SizedBox(height: 20),
                 TextFormField(
                   controller: _cityController,
@@ -148,7 +155,8 @@ class _CoachSetupScreenState extends State<CoachSetupScreen> {
                 ),
                 const SizedBox(height: 20),
                 // Date Picker for Birthday
-                Text('Birthday: ${_selectedBirthday.toLocal().toString().split(' ')[0]}'),
+                Text(
+                    'Birthday: ${_selectedBirthday.toLocal().toString().split(' ')[0]}'),
                 ElevatedButton(
                   onPressed: () async {
                     final selectedDate = await showDatePicker(
@@ -157,7 +165,8 @@ class _CoachSetupScreenState extends State<CoachSetupScreen> {
                       firstDate: DateTime(1900),
                       lastDate: DateTime.now(),
                     );
-                    if (selectedDate != null && selectedDate != _selectedBirthday) {
+                    if (selectedDate != null &&
+                        selectedDate != _selectedBirthday) {
                       setState(() {
                         _selectedBirthday = selectedDate;
                       });
@@ -166,26 +175,31 @@ class _CoachSetupScreenState extends State<CoachSetupScreen> {
                   child: const Text('Select Date'),
                 ),
                 const SizedBox(height: 20),
-                DropdownButtonFormField<String>(
-                  decoration: const InputDecoration(
-                    labelText: 'Activity',
-                    border: OutlineInputBorder(),
-                  ),
-                  value: _selectedActivityId,
-                  onChanged: (newValue) {
-                    setState(() {
-                      _selectedActivityId = newValue;
-                    });
-                  },
-                  items: ['vZtdHL54Ma8Bz9BlXNxP', 'AnotherActivityID']
-                      .map((activityId) => DropdownMenuItem(
-                    value: activityId,
-                    child: Text(activityId),
-                  ))
-                      .toList(),
-                  validator: (value) =>
-                  value == null ? 'Please select an activity ID' : null,
-                ),
+                // Multi-select for Activities
+                const Text('Select Activities'),
+                _activities.isEmpty
+                    ? const CircularProgressIndicator() // Show loading indicator until activities are fetched
+                    : Column(
+                        children: _activities.map((activity) {
+                          final activityId = activity.id;
+                          final activityName =
+                              activity['activityName'] ?? 'Activity';
+
+                          return CheckboxListTile(
+                            title: Text(activityName),
+                            value: _selectedActivities.contains(activityId),
+                            onChanged: (isChecked) {
+                              setState(() {
+                                if (isChecked!) {
+                                  _selectedActivities.add(activityId);
+                                } else {
+                                  _selectedActivities.remove(activityId);
+                                }
+                              });
+                            },
+                          );
+                        }).toList(),
+                      ),
                 const SizedBox(height: 40),
                 ElevatedButton(
                   onPressed: _isLoading ? null : _submitData,
@@ -199,9 +213,9 @@ class _CoachSetupScreenState extends State<CoachSetupScreen> {
                   child: _isLoading
                       ? const CircularProgressIndicator(color: Colors.white)
                       : const Text(
-                    'Submit',
-                    style: TextStyle(fontSize: 18, color: Colors.white),
-                  ),
+                          'Submit',
+                          style: TextStyle(fontSize: 18, color: Colors.white),
+                        ),
                 ),
               ],
             ),
@@ -226,8 +240,9 @@ class _CoachSetupScreenState extends State<CoachSetupScreen> {
 
       final coachData = {
         'fullName': _fullNameController.text,
-        'activityID': FirebaseFirestore.instance.collection('activities').doc(_selectedActivityId),
-        'age': int.tryParse(_ageController.text) ?? 0,
+        'activityIDs':
+            _selectedActivities, // Store selected activities as a list
+
         'birthday': Timestamp.fromDate(_selectedBirthday),
         'certifications': _certificationsController.text,
         'city': _cityController.text,
@@ -243,7 +258,8 @@ class _CoachSetupScreenState extends State<CoachSetupScreen> {
       // Navigate to CoachLandingPage after successful setup
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (context) => const CoachLandingPage(), // Ensure this page is correctly imported
+          builder: (context) =>
+              const CoachLandingPage(), // Ensure this page is correctly imported
         ),
       );
     } catch (e) {
@@ -270,5 +286,4 @@ class _CoachSetupScreenState extends State<CoachSetupScreen> {
       });
     }
   }
-
 }

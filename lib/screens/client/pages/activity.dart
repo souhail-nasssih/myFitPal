@@ -20,6 +20,8 @@ class _ActivityScreenState extends State<ActivityScreen>
   late TabController _tabController;
   late PageController _pageController;
   String? _userName;
+  bool _isLoading = true; // Ajout d'un état de chargement
+  String? _error; // Stocke les erreurs de récupération
 
   @override
   void initState() {
@@ -38,6 +40,7 @@ class _ActivityScreenState extends State<ActivityScreen>
       }
     });
 
+    // Récupérer le nom de l'utilisateur
     getClientName();
   }
 
@@ -52,24 +55,27 @@ class _ActivityScreenState extends State<ActivityScreen>
             .get();
 
         if (documentSnapshot.exists) {
-          var clientData = documentSnapshot.data() as Map<String, dynamic>;
+          var clientData = documentSnapshot.data() as Map<String, dynamic>?;
           setState(() {
-            _userName = clientData['fullname'] ?? 'Utilisateur inconnu';
+            _userName = clientData?['fullName'] ?? 'Utilisateur inconnu';
+            _isLoading = false;
           });
         } else {
           setState(() {
             _userName = 'Utilisateur inconnu';
+            _isLoading = false;
           });
         }
       } catch (e) {
-        print('Error fetching client name: $e');
         setState(() {
-          _userName = 'Utilisateur inconnu';
+          _error = 'Erreur lors de la récupération des données: $e';
+          _isLoading = false;
         });
       }
     } else {
       setState(() {
         _userName = 'Utilisateur inconnu';
+        _isLoading = false;
       });
     }
   }
@@ -85,15 +91,17 @@ class _ActivityScreenState extends State<ActivityScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
-            const Text('Activités, '),
-            Text(
-              _userName ?? 'Utilisateur inconnu',
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
+        title: _isLoading
+            ? const CircularProgressIndicator() // Affichage de chargement
+            : Row(
+                children: [
+                  const Text('Activités, '),
+                  Text(
+                    _userName ?? 'Utilisateur inconnu',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
         bottom: TabBar(
           controller: _tabController,
           labelColor: ColorsHelper.secondaryColor,
@@ -106,23 +114,30 @@ class _ActivityScreenState extends State<ActivityScreen>
           ],
         ),
       ),
-      body: PageView(
-        controller: _pageController,
-        children: [
-          AllActivitiesPage(onActivityClick: (activityID) {
-            print('Navigating to details for: $activityID');
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    ActivityDetailScreen(activityID: activityID),
-              ),
-            );
-          }),
-          const PopularActivitiesPage(),
-          const IntensiveActivitiesPage(),
-        ],
-      ),
+      body: _isLoading
+          ? const Center(
+              child: CircularProgressIndicator()) // Affichage de chargement
+          : _error != null
+              ? Center(
+                  child: Text(_error!,
+                      style: const TextStyle(
+                          color: Colors.red))) // Affichage de l'erreur
+              : PageView(
+                  controller: _pageController,
+                  children: [
+                    AllActivitiesPage(onActivityClick: (activityID) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              ActivityDetailScreen(activityID: activityID),
+                        ),
+                      );
+                    }),
+                    const PopularActivitiesPage(),
+                    const IntensiveActivitiesPage(),
+                  ],
+                ),
       bottomNavigationBar: const BottomBar(currentIndex: 0),
     );
   }

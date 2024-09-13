@@ -47,20 +47,38 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  // Function to invite a coach
+  void inviteCoach() {
+    // Logic to send invitation goes here
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Invitation Envoyée'),
+        content: const Text('Une invitation a été envoyée à votre coach.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<Map<String, dynamic>>(
       future: _clientDataFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          // Afficher le widget de chargement pendant le chargement des données
           return const Scaffold(
             body: Center(
                 child:
                     FitnessLoading()), // Remplacez avec le widget de chargement
           );
         } else if (snapshot.hasError) {
-          // Afficher un message d'erreur et un bouton pour réessayer en cas d'erreur
           return Scaffold(
             body: Center(
               child: Column(
@@ -85,7 +103,6 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
           );
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          // Afficher un message lorsque les données utilisateur ne sont pas trouvées
           return const Scaffold(
             body: Center(child: Text('Données utilisateur introuvables')),
           );
@@ -151,7 +168,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   const SizedBox(height: 20),
                   Center(
                     child: Text(
-                      userData['fullname'] ?? 'Nom inconnu',
+                      userData['fullName'] ?? 'Nom inconnu',
                       style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -226,6 +243,19 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   ),
                   const Spacer(),
+                  ElevatedButton(
+                    onPressed: inviteCoach,
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 15, horizontal: 30),
+                      backgroundColor: Colors.purple,
+                    ),
+                    child: const Text(
+                      'Inviter un Coach',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),
