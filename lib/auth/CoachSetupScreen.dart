@@ -22,7 +22,7 @@ class _CoachSetupScreenState extends State<CoachSetupScreen> {
 
   final TextEditingController _cityController = TextEditingController();
   DateTime _selectedBirthday = DateTime.now();
-  List<String> _selectedActivities = []; // List to hold multiple activity IDs
+  final List<String> _selectedActivities = []; // List to hold multiple activity IDs
   List<QueryDocumentSnapshot> _activities = []; // Store the activities data
   bool _isLoading = false;
 

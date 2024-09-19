@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:myfitpal/auth/login_screen.dart';
+import 'package:myfitpal/screens/SignUp.dart';
 import 'package:myfitpal/screens/client/pages/activity.dart';
 import 'package:myfitpal/screens/client/pages/calendar.dart';
 import 'package:myfitpal/screens/client/pages/insights.dart';
@@ -11,6 +12,7 @@ class Routes {
   static const String calendar = '/calendar';
   static const String profile = '/profile';
   static const String login = '/login';
+  static const String signup = '/signup';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -24,6 +26,8 @@ class Routes {
         return MaterialPageRoute(builder: (_) => const ProfilePage());
       case login:
         return MaterialPageRoute(builder: (_) => const LoginScreen());
+      case signup:
+        return MaterialPageRoute(builder: (_) => const SignUp());
       default:
         return MaterialPageRoute(
             builder: (_) => const LoginScreen()); // Default route

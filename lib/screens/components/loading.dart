@@ -45,7 +45,7 @@ class _FitnessLoadingState extends State<FitnessLoading>
                   child: Container(
                     width: 80,
                     height: 80,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       shape: BoxShape.circle,
                       color: Colors
                           .purpleAccent, // Couleur unie pour plus de simplicité

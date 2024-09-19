@@ -55,7 +55,7 @@ class _AllActivitiesPageState extends State<AllActivitiesPage> {
                       widget.onActivityClick(activityID); // Passer activityID
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('ID d\'activité manquant')),
+                        const SnackBar(content: Text('ID d\'activité manquant')),
                       );
                     }
                   },

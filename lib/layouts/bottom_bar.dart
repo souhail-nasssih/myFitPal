@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:myfitpal/helpers/helpers.dart';
 import 'package:myfitpal/screens/client/pages/activity.dart';
@@ -17,7 +16,7 @@ class BottomBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BottomAppBar(
-      color:  ColorsHelper.backgroundColor,
+      color: ColorsHelper.backgroundColor,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: <Widget>[
@@ -49,7 +48,9 @@ class BottomBar extends StatelessWidget {
         IconButton(
           icon: Icon(
             iconData,
-            color: isSelected ?ColorsHelper.backgroundColor : ColorsHelper.secondaryColor,
+            color: isSelected
+                ? ColorsHelper.backgroundColor
+                : ColorsHelper.secondaryColor,
           ),
           onPressed: () {
             if (currentIndex != index) {

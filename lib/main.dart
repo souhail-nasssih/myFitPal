@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart'; // Import Firebase Core
+import 'package:firebase_core/firebase_core.dart';
+import 'package:myfitpal/screens/login.dart'; // Import Firebase Core
 import 'package:myfitpal/screens/splash/splash_screen.dart';
 
 void main() async {
@@ -15,8 +16,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'My Second App',
-      home: const SplashScreen(), // Keep SplashScreen as the initial screen
+      title: 'MyFitPal',
+      // home: const Login(), // Keep SplashScreen as the initial screen
+      home: const SplashScreen(),
       theme: ThemeData(
         brightness: Brightness.light,
       ),
