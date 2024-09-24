@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:myfitpal/layouts/bottom_bar.dart';
 import 'package:myfitpal/screens/client/components/giveCoatch.dart';
 import 'package:myfitpal/screens/client/components/searchLocation.dart';
+import 'package:myfitpal/screens/client/components/searchSession.dart';
 
 class ActivityDetailScreen extends StatelessWidget {
   final String activityID;
@@ -28,7 +29,7 @@ class ActivityDetailScreen extends StatelessWidget {
             GiveCoatch(
                 activityID: activityID), // Passer activityID à ProfileList
             SearchLocation(activityID: activityID),
-            const Center(child: Text('Session Info')),
+            const SearchSession()
           ],
         ),
         bottomNavigationBar: const BottomBar(currentIndex: 0),

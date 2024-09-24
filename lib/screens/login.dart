@@ -41,10 +41,10 @@ class _LoginState extends State<Login> {
             maxChildSize: 0.75,
             builder: (context, scrollController) {
               return Container(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: ColorsHelper
                       .backgroundColor, // Utilisation de la couleur de fond
-                  borderRadius: const BorderRadius.only(
+                  borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(40),
                     topRight: Radius.circular(40),
                   ),

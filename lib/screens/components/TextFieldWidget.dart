@@ -32,7 +32,7 @@ class TextFieldWidget extends StatelessWidget {
             ColorsHelper.colorFond, // Utilisation de la couleur de fond définie
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide(
+          borderSide: const BorderSide(
               color: ColorsHelper.colorGrey ?? Colors.grey,
               width: 1), // Couleur grise pour la bordure
         ),

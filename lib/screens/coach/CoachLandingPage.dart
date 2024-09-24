@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:myfitpal/helpers/helpers.dart';
 import 'package:myfitpal/screens/client/pages/SettingsTab.dart';
-import 'ProfileCoachTab.dart';
+import 'package:myfitpal/screens/coach/HomeSceenCoach.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:myfitpal/screens/coach/playning.dart';
+import 'ProfileCoachTab.dart';
 
 class CoachLandingPage extends StatefulWidget {
   const CoachLandingPage({super.key});
@@ -16,7 +19,10 @@ class _CoachLandingPageState extends State<CoachLandingPage> {
   User? _currentUser;
   Map<String, dynamic>? _coachData;
 
+  // Liste des pages de l'application
   final List<Widget> _pages = [
+    const HomeScreenCoach(),
+    const CoachPlanningPage(), // Ajout de la page de planning ici
     const ProfileCoachTab(),
     const SettingsTab(),
   ];
@@ -62,27 +68,19 @@ class _CoachLandingPageState extends State<CoachLandingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color(0xFFDF6D00),
-        title: const Text(
-          'Coach Dashboard',
-          style: TextStyle(color: Colors.white),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () async {
-              await FirebaseAuth.instance.signOut();
-              Navigator.of(context).pushReplacementNamed('/login'); // Replace with your login route
-            },
-          ),
-        ],
-      ),
       body: _coachData == null
           ? const Center(child: CircularProgressIndicator())
-          : _pages[_selectedIndex],
+          : _pages[_selectedIndex], // Affiche la page sélectionnée
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_month),
+            label: 'Planning', // Correction de l'orthographe
+          ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: 'Profile',
@@ -93,7 +91,7 @@ class _CoachLandingPageState extends State<CoachLandingPage> {
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: const Color(0xFFDF6D00),
+        selectedItemColor: ColorsHelper.colorBlueText,
         unselectedItemColor: Colors.grey,
         onTap: _onItemTapped,
         type: BottomNavigationBarType.fixed,

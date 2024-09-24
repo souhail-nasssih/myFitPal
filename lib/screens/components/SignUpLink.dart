@@ -19,7 +19,7 @@ class SignUpLink extends StatelessWidget {
             Navigator.pushReplacement(context,
                 MaterialPageRoute(builder: (context) => const SignUp()));
           },
-          child: Text(
+          child: const Text(
             'Sign up',
             style: TextStyle(
               color: ColorsHelper.colorBlueText,
