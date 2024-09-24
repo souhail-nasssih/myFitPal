@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import '../screens/onboarding/pathSelection.dart';
 import 'login_screen.dart'; // Ensure the correct path is imported
 
@@ -14,7 +16,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
-      TextEditingController();
+  TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   bool _isLoading = false;
@@ -72,6 +74,46 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
+  Future<void> _signInWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) {
+        return; // The user canceled the sign-in
+      }
+
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      UserCredential userCredential = await _auth.signInWithCredential(credential);
+      final User? user = userCredential.user;
+
+      if (user != null) {
+        // Save user's additional info (like name and email) to Firestore
+        await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+          'name': user.displayName,
+          'email': user.email,
+          'birthDate': null, // You might need to request this info separately
+          'createdAt': FieldValue.serverTimestamp(),
+        }, SetOptions(merge: true));
+
+        // Navigate to the Path Selection screen
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const PathSelectionScreen()), // Your path selection screen
+        );
+      }
+    } catch (e) {
+      print('Error signing in with Google: $e');
+    }
+  }
+
+
+
+
+
   String _getErrorMessage(String errorCode) {
     switch (errorCode) {
       case 'email-already-in-use':
@@ -80,8 +122,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
         return 'The email address is not valid.';
       case 'weak-password':
         return 'The password provided is too weak.';
-      case 'operation-not-allowed':
-        return 'Operation not allowed. Please contact support.';
       default:
         return 'An unexpected error occurred. Please try again.';
     }
@@ -159,7 +199,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           onPressed: () {
                             setState(() {
                               _obscureConfirmPassword =
-                                  !_obscureConfirmPassword;
+                              !_obscureConfirmPassword;
                             });
                           },
                         ),
@@ -178,41 +218,46 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                           child: Center(
                             child: _isLoading
-                                ? const CircularProgressIndicator(color: Colors.white)
+                                ? const CircularProgressIndicator(
+                              color: Colors.white,
+                            )
                                 : const Text(
-                                    "Sign Up",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
+                              "Sign Up",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
                         ),
                       ),
                       const SizedBox(height: 20),
-                      const Row(
-                        children: [
-                          Expanded(child: Divider(thickness: 0.8)),
-                          SizedBox(width: 5),
-                          Text("Or"),
-                          SizedBox(width: 5),
-                          Expanded(child: Divider(thickness: 0.8)),
-                        ],
+                      const Text(
+                        "Or",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(height: 20),
-                      // _buildSocialLoginButtons(),
-                      const SizedBox(height: 20),
-                      TextButton(
-                        onPressed: () {
+                      _buildSocialLoginButtons(),
+                      const SizedBox(height: 30),
+                      GestureDetector(
+                        onTap: () {
                           Navigator.of(context).pushReplacement(
                             MaterialPageRoute(
                                 builder: (context) => const LoginScreen()),
                           );
                         },
                         child: const Text(
-                          "Already have an account? Log In",
-                          style: TextStyle(color: Colors.deepOrange),
+                          "Already have an account? Log in",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.deepOrange,
+                          ),
                         ),
                       ),
                     ],
@@ -230,64 +275,53 @@ class _SignUpScreenState extends State<SignUpScreen> {
     required TextEditingController controller,
     required String hintText,
     required IconData icon,
-    bool obscureText = false,
     String? errorText,
+    bool obscureText = false,
     Widget? suffixIcon,
   }) {
-    return Container(
-      height: 50,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.grey[200],
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        child: Row(
-          children: [
-            Icon(icon, color: Colors.black.withOpacity(0.5)),
-            const SizedBox(width: 15),
-            Expanded(
-              child: TextField(
-                controller: controller,
-                obscureText: obscureText,
-                cursorColor: Colors.black.withOpacity(0.5),
-                decoration: InputDecoration(
-                  hintText: hintText,
-                  border: InputBorder.none,
-                  suffixIcon: suffixIcon,
-                  errorText: errorText,
-                ),
-              ),
-            ),
-          ],
+    return TextField(
+      controller: controller,
+      obscureText: obscureText,
+      decoration: InputDecoration(
+        hintText: hintText,
+        errorText: errorText,
+        prefixIcon: Icon(
+          icon,
+          color: Colors.black.withOpacity(0.5),
+        ),
+        suffixIcon: suffixIcon,
+        contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
         ),
       ),
     );
   }
 
-  // Widget _buildSocialLoginButtons() {
-  //   return Row(
-  //     mainAxisAlignment: MainAxisAlignment.center,
-  //     children: [
-  //       _buildSocialButton("images/1.png"),
-  //       SizedBox(width: 20),
-  //       _buildSocialButton("images/1.png"),
-  //     ],
-  //   );
-  // }
-
-  Widget _buildSocialButton(String assetPath) {
-    return Container(
-      width: 50,
-      height: 50,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black.withOpacity(0.1)),
-      ),
-      child: Center(
-        child: Image.asset(assetPath),
+  Widget _buildSocialButton(String imagePath) {
+    return CircleAvatar(
+      radius: 20,
+      backgroundColor: Colors.white,
+      child: Image.asset(
+        imagePath,
+        height: 40,
       ),
     );
   }
+
+  Widget _buildSocialLoginButtons() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        GestureDetector(
+          onTap: _signInWithGoogle,
+          child: _buildSocialButton("images/google_logo.png"),
+        ),
+        const SizedBox(width: 20),
+      ],
+    );
+  }
+
+
+
 }

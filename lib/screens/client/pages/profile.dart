@@ -18,7 +18,7 @@ class _ProfilePageState extends State<ProfilePage> {
   String? _bio;
   String? _location;
   String? _pricing;
-  String? _profileImageUrl;
+
 
   @override
   void initState() {
@@ -33,7 +33,7 @@ class _ProfilePageState extends State<ProfilePage> {
     if (userId.isNotEmpty) {
       try {
         DocumentSnapshot userDoc = await FirebaseFirestore.instance
-            .collection('clients') // Assuming you're storing clients
+            .collection('clients') // Ensure this matches your Firestore setup
             .doc(userId)
             .get();
 
@@ -46,8 +46,6 @@ class _ProfilePageState extends State<ProfilePage> {
             _pricing = userData['pricing'] != null
                 ? '\$${userData['pricing']}/H'
                 : 'Pricing not available';
-            _profileImageUrl = userData['profileImageUrl'] ??
-                'images/avatar.png'; // Default image if no profile pic exists
           });
         } else {
           print('User document does not exist');
@@ -55,6 +53,8 @@ class _ProfilePageState extends State<ProfilePage> {
       } catch (e) {
         print('Error fetching user data: $e');
       }
+    } else {
+      print('No user is currently logged in');
     }
   }
 
@@ -82,13 +82,6 @@ class _ProfilePageState extends State<ProfilePage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             const Padding(padding: EdgeInsets.all(10)),
-            CircleAvatar(
-              radius: 50,
-              backgroundImage: _profileImageUrl != null
-                  ? NetworkImage(_profileImageUrl!)
-                  : const AssetImage('images/avatar.png') as ImageProvider,
-              backgroundColor: Colors.transparent,
-            ),
             const Padding(padding: EdgeInsets.all(10)),
             const SizedBox(height: 16),
             Text(
@@ -100,8 +93,7 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             const SizedBox(height: 8),
             Text(
-              _bio ??
-                  'No bio available', // Display bio or fallback text if bio is null
+              _bio ?? 'No bio available',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16,

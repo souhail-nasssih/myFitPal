@@ -14,7 +14,6 @@ class ClientSetupScreen extends StatefulWidget {
 class _ClientSetupScreenState extends State<ClientSetupScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _fullNameController = TextEditingController();
-  final TextEditingController _ageController = TextEditingController();
   final TextEditingController _goalController = TextEditingController();
   final TextEditingController _phoneNumberController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
@@ -81,12 +80,6 @@ class _ClientSetupScreenState extends State<ClientSetupScreen> {
                   const Color(0xFFDF6D00),
                 ),
                 const SizedBox(height: 20),
-                _buildTextField(
-                  _ageController, 'Age',
-                  'Please enter your age',
-                  const Color(0xFFDF6D00),
-                  TextInputType.number,
-                ),
                 const SizedBox(height: 20),
                 _buildBirthdayPicker(),
                 const SizedBox(height: 20),
@@ -209,7 +202,6 @@ class _ClientSetupScreenState extends State<ClientSetupScreen> {
       }
 
       final clientData = {
-        'age': int.tryParse(_ageController.text) ?? 0,
         'birthday': _selectedBirthday,
         'email': user.email,
         'fullName': _fullNameController.text,
